@@ -130,7 +130,7 @@ for screening_percentile, val_score in validation_scores.items():
 
 # %%
 # The above block of code can help determine which screening percentile is
-# optimal when the decoder is fitted and validated on there specific.
+# optimal when the decoder is fitted and validated on specific data.
 # **However**, there are some important caveats to note:
 #
 # 1. The above code use a single train-test split. Different splits will give
@@ -156,9 +156,9 @@ for screening_percentile, val_score in validation_scores.items():
 #    :class:`~nilearn.decoding.Decoder` class and other ``sklearn`` estimators.
 # 2. The outer CV loop is used for model evaluation. For each fold, the model
 #    is refit using the best hyperparameter value from the inner CV loop, and a
-#    testscore is obtained on the left-out test set. We then report the average
-#    test score across folds as an estimate of the generalization performance
-#    of the model.
+#    test score is obtained on the left-out test set. We then report the
+#    average test score across folds as an estimate of the generalization
+#    performance of the model.
 
 import numpy as np
 from sklearn.model_selection import GroupKFold
