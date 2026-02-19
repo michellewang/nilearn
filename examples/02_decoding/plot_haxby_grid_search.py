@@ -22,7 +22,7 @@ technique sometimes known as CV bagging). However, there is no built-in way to
 tune hyperparameters related to feature selection: this has to be done manually
 using the nested cross-validation method, where the inner CV loop is used to
 tune hyperparameters and the outer CV loop is used to evaluate model
-performance. See https://scikit-learn.org/stable/modules/cross_validation.html
+performance. See :sklearn:`modules/cross_validation.html`
 for an excellent explanation of how cross-validation works.
 """
 
@@ -69,7 +69,7 @@ runs = labels["chunks"][condition_mask]  # 12 runs total
 # Let's define a helper function that creates and fits a single instance of a
 # Decoder with a given value of the ``screening_percentile`` parameter. This
 # function will allow us to avoid duplication of the code since we only want to
-# vary the screening_percentile hyperparameter.
+# vary the ``screening_percentile`` hyperparameter.
 
 import warnings
 
@@ -89,7 +89,7 @@ def fit_decoder(X, y, screening_percentile):
         warnings.filterwarnings(
             action="ignore",
             category=UserWarning,
-            message=".*Generation of a mask has been requested",
+            message=r"\[NiftiMasker\.fit\] Generation of a mask has been requested",  # noqa: E501
         )
         warnings.filterwarnings(
             action="ignore",
