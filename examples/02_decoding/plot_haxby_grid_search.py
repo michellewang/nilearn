@@ -153,7 +153,7 @@ for screening_percentile, val_score in validation_scores.items():
 #    **Note**: this is similar in concept to ``sklearn``'s
 #    :class:`~sklearn.model_selection.GridSearchCV`, which cannot be used here
 #    because of input data incompatibility between the
-#    :class:`~nilearn.decoding.Decoder` and other ``sklearn`` estimators.
+#    :class:`~nilearn.decoding.Decoder` class and other ``sklearn`` estimators.
 # 2. The outer CV loop is used for model evaluation. For each fold, the model
 #    is refit using the best hyperparameter value from the inner CV loop, and a
 #    testscore is obtained on the left-out test set. We then report the average
