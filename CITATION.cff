@@ -41,6 +41,12 @@ license: BSD-4-Clause
 
 authors:
   - family-names: Nilearn contributors
+  - given-names: Johanna
+    family-names: Bayer
+    website: https://opencodereview.netlify.app/
+    affiliation: McGill University, Montréal, Canada
+    email: hannabayer.89@gmail.com
+    orcid: https://orcid.org/0000-0003-4891-6256
   - given-names: Ahmad
     family-names: Chamma
     website: https://github.com/achamma723
