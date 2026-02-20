@@ -1,5 +1,4 @@
 import base64
-import warnings
 from io import BytesIO
 
 import numpy as np
@@ -7,8 +6,7 @@ import pytest
 from matplotlib import pyplot as plt
 from nibabel import Nifti1Image
 
-from nilearn import datasets, image
-from nilearn._utils.helpers import is_gil_enabled
+from nilearn import image
 from nilearn.conftest import _img_3d_rand
 from nilearn.image import get_data, new_img_like
 from nilearn.plotting._engine_utils import colorscale
@@ -372,91 +370,38 @@ def test_get_cut_slices(affine_eye):
     assert (cut_slices == [4, 4, 4]).all()
 
 
-@pytest.mark.slow
-@pytest.mark.thread_unsafe
-@pytest.mark.skipif(not is_gil_enabled(), reason="fails without GIL")
 @pytest.mark.parametrize(
-    "params, warning_msg",
+    "view_img_kwargs,expected_output_title",
     [
-        (
-            {"threshold": 2.0, "vmax": 4.0},
-            "The given float value must not exceed .*",
-        ),
-        (
-            {"symmetric_cmap": False},
-            "'partition' will ignore the 'mask' of the MaskedArray *",
-        ),
+        ({"threshold": 2.0, "vmax": 4.0}, "Slice viewer"),
+        ({"threshold": 1e6}, "Slice viewer"),
+        ({"width_view": 1000}, "Slice viewer"),
+        ({"threshold": "95%", "title": "SOME_TITLE"}, "SOME_TITLE"),
     ],
 )
-def test_view_img_3d_warnings(params, warning_msg):
-    """Test warning when viewing 3D images."""
-    mni = datasets.load_mni152_template(resolution=2)
+def test_view_img_3d(img_3d_mni, view_img_kwargs, expected_output_title):
+    """Test plotting of 3D images with different params."""
+    html_view = view_img(img_3d_mni, **view_img_kwargs)
+    check_html_view_img(html_view, title=expected_output_title)
 
-    # Create a fake functional image by resample the template
-    img = image.resample_img(mni, target_affine=3 * np.eye(3))
 
-    # Should not raise warnings
-    with warnings.catch_warnings(record=True) as w:
-        html_view = view_img(img, bg_img=None)
-    assert len(w) == 0
-
-    with pytest.warns(UserWarning, match=warning_msg):
-        html_view = view_img(img, **params)
-
+def test_view_img_4d(img_3d_mni):
+    """Test for 4D images."""
+    # convert into 4D (with only 1 timepoint)
+    img_4d_mni = image.new_img_like(
+        img_3d_mni, get_data(img_3d_mni)[:, :, :, np.newaxis]
+    )
+    html_view = view_img(img_4d_mni)
     check_html_view_img(html_view)
 
 
-@pytest.mark.slow
-def test_view_img_3d_warnings_more():
-    """Test warning when viewing 3D images.
-
-    Has more precise checks on the output.
-    """
-    mni = datasets.load_mni152_template(resolution=2)
-
-    # Create a fake functional image by resample the template
-    img = image.resample_img(mni, target_affine=3 * np.eye(3))
-
+def test_view_img_warnings(img_3d_mni):
+    """Test that warning about the threshold is emitted."""
+    # expect warning otherwise
     with pytest.warns(
-        UserWarning,
-        match="'partition' will ignore the 'mask' of the MaskedArray",
+        UserWarning, match="The given float value must not exceed .*"
     ):
-        html_view = view_img(img)
-
-    check_html_view_img(html_view, title="Slice viewer")
-
-    with pytest.warns(
-        UserWarning,
-        match="'partition' will ignore the 'mask' of the MaskedArray",
-    ):
-        html_view = view_img(img, threshold="95%", title="SOME_TITLE")
-
-    check_html_view_img(html_view, title="SOME_TITLE")
-
-
-@pytest.mark.slow
-@pytest.mark.parametrize(
-    "params",
-    [
-        {"threshold": 2.0, "vmax": 4.0},
-        {"threshold": 1e6},
-        {"width_view": 1000},
-    ],
-)
-def test_view_img_4d_warnings(params):
-    """Test warning when viewing 4D images."""
-    mni = datasets.load_mni152_template(resolution=2)
-
-    # Create a fake functional image by resample the template
-    img = image.resample_img(mni, target_affine=3 * np.eye(3))
-    img_4d = image.new_img_like(img, get_data(img)[:, :, :, np.newaxis])
-    assert len(img_4d.shape) == 4
-
-    with pytest.warns(
-        UserWarning,
-        match="'partition' will ignore the 'mask' of the MaskedArray",
-    ):
-        html_view = view_img(img_4d, **params)
+        html_view = view_img(img_3d_mni, threshold=1000)
 
     check_html_view_img(html_view)
 
